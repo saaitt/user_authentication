@@ -15,6 +15,10 @@ And then:
 
 ```go run main.go```
 
+And to run the tests all together:
+
+`go test ./...`
+
 
 # Docs
 ## List Users
