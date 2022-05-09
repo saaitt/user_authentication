@@ -23,4 +23,6 @@ func Api(e *echo.Echo, userHandler Handler) {
 	userGroup.POST("/", userHandler.Create)
 	userGroup.GET("/", userHandler.List)
 	userGroup.DELETE("/:user_id", userHandler.DELETE)
+	userGroup.POST("/signup", userHandler.Signup)
+
 }
