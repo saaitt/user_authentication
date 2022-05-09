@@ -17,9 +17,17 @@ func (s SQLUserRepo) Create(user *model.User) error {
 	return nil
 }
 
-func (s SQLUserRepo) ListAll(page int, cancelled bool) ([]model.User, error) {
+func (s SQLUserRepo) ListAllWithFilter(page int, cancelled bool) ([]model.User, error) {
 	users := []model.User{}
 	if err := s.DB.Limit(10).Offset(page*10).Where("cancelled=?", cancelled).Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+func (s SQLUserRepo) ListAll(page int) ([]model.User, error) {
+	users := []model.User{}
+	if err := s.DB.Limit(10).Offset(page*10).Find(&users).Error; err != nil {
 		return nil, err
 	}
 	return users, nil
@@ -41,7 +49,7 @@ func (s SQLUserRepo) DeleteUserByID(userID string) error {
 	return nil
 }
 
-func (s SQLUserRepo) UpdateUser(user *model.User) error {
-	s.DB.Model(&user).Updates(&user)
+func (s SQLUserRepo) SetUserCancelledToTrue(userID string) error {
+	s.DB.Model(&model.User{}).Where("id = ?", userID).Update("cancelled", "true")
 	return nil
 }

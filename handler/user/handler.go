@@ -25,7 +25,7 @@ func (h Handler) Create(c echo.Context) error {
 }
 
 func (h Handler) List(c echo.Context) error {
-	cancelledSubStr := c.QueryParam("cancelled_subscription")
+	cancelledSubStr := c.QueryParam("cancelled")
 	pageStr := c.QueryParam("page")
 
 	users, err := h.Service.ListUsers(pageStr, cancelledSubStr)
@@ -61,4 +61,14 @@ func (h Handler) Signup(c echo.Context) error {
 		}
 	}
 	return c.JSON(http.StatusOK, user)
+}
+
+func (h Handler) CancelSignup(c echo.Context) error {
+	userID := c.Param("user_id")
+
+	err := h.Service.CancelUserSignup(userID)
+	if err != nil {
+		return echo.ErrInternalServerError
+	}
+	return c.NoContent(http.StatusNoContent)
 }

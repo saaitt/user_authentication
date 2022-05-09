@@ -9,10 +9,11 @@ import (
 
 type SQLUserRepo interface {
 	Create(user *model.User) error
-	ListAll(page int, cancelled bool) ([]model.User, error)
+	ListAllWithFilter(page int, cancelled bool) ([]model.User, error)
+	ListAll(page int) ([]model.User, error)
 	FindUserByNationalID(nationalID string) (*model.User, error)
 	DeleteUserByID(userID string) error
-	UpdateUser(user *model.User) error
+	SetUserCancelledToTrue(userID string) error
 }
 
 type Service struct {
@@ -54,15 +55,23 @@ func (s Service) ListUsers(pageStr string, cancelledSubStr string) ([]model.User
 		fmt.Printf("there was an error converting page param string to int in List user data %+v", err)
 		page = 0
 	}
+
 	if cancelledSubStr == "" {
-		cancelledSubStr = "false"
+		users, err := s.Repo.ListAll(page)
+		if err != nil {
+			return nil, err
+		}
+		return users, nil
 	}
+
 	cancelledSubscription, err := strconv.ParseBool(cancelledSubStr)
 	if err != nil {
 		fmt.Printf("there was an error converting cancelled_subscription string to boolean in List user data %+v", err)
 		cancelledSubscription = false
 	}
-	users, err := s.Repo.ListAll(page, cancelledSubscription)
+	println(cancelledSubscription, page)
+
+	users, err := s.Repo.ListAllWithFilter(page, cancelledSubscription)
 	if err != nil {
 		return nil, err
 	}
@@ -74,6 +83,18 @@ func (s Service) DeleteUser(userID string) error {
 		return fmt.Errorf("no user id was passed")
 	}
 	err := s.Repo.DeleteUserByID(userID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s Service) CancelUserSignup(UserID string) error {
+	if UserID == "" {
+		return fmt.Errorf("no user id was passed")
+	}
+
+	err := s.Repo.SetUserCancelledToTrue(UserID)
 	if err != nil {
 		return err
 	}

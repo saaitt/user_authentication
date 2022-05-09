@@ -24,5 +24,5 @@ func Api(e *echo.Echo, userHandler Handler) {
 	userGroup.GET("/", userHandler.List)
 	userGroup.DELETE("/:user_id", userHandler.DELETE)
 	userGroup.POST("/signup", userHandler.Signup)
-
+	userGroup.POST("/signup/cancel/:user_id", userHandler.CancelSignup)
 }
